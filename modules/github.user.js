@@ -47,32 +47,40 @@ DarkTip.registerModule('github.user', {
 	},
 	
 	'templates': {
-		'core':(
+		'darktip.github.user:main':(
 			'<div class="tooltip-github-user">' +
-				'<div class="avatar"><img src="<%= this["avatar_url"] %>" alt="<%= this["login"] %>" title="<%= this["login"] %>" /></div>' +
+				'<div class="avatar">{>darktip.github.user:avatar}</div>' +
 				'<div class="col-98">' +
-					'<% if(this["name"]) { %><div class="headline-right realname "><%= this["name"] %></div><% } %>' +
-					'<div class="darktip-row headline username"><%= this["login"] %></div>' +
-					'<div class="githubbed">' +
-						'<% if(this["followers"]) { %><div class="followers"><label><%= this._loc("label.followers") %></label> <%= this["followers"] %></div><% } %>' +
-						'<% if(this["following"]) { %><div class="following"><label><%= this._loc("label.following") %></label> <%= this["following"] %></div><% } %>' +
-						'<% if(this["public_repos"]) { %><div class="public_repos"><label><%= this._loc("label.public_repos") %></label> <%= this["public_repos"] %></div><% } %>' +
-						'<% if(this["public_gists"]) { %><div class="public_gists"><label><%= this._loc("label.public_gists") %></label> <%= this["public_gists"] %></div><% } %>' +
-					'</div>' +
-					'<div class="personals">' +
-						'<% if(this["email"]) { %><div class="email"><label><%= this._loc("label.email") %></label> <%= this["email"] %></div><% } %>' +
-						'<% if(this["blog"]) { %><div class="blog"><label><%= this._loc("label.blog") %></label> <%= this["blog"] %></div><% } %>' +
-						'<% if(this["company"]) { %><div class="company"><label><%= this._loc("label.company") %></label> <%= this["company"] %></div><% } %>' +
-						'<% if(this["location"]) { %><div class="location"><label><%= this._loc("label.location") %></label> <%= this["location"] %></div><% } %>' +
-					'</div>' +
+					'{>darktip.github.user:headline}' +
+					'<div class="githubbed">{>darktip.github.user:githubbed}</div>' +
+					'<div class="personals">{>darktip.github.user:personals}</div>' +
 				'</div>' +
-				'<% if(this["bio"]) { %><div class="darktip-row bio"><%= this["bio"] %></div><% } %>' +
+				'{?bio}<div class="darktip-row bio">{bio}</div>{/bio}' +
 			'</div>'				
 		),
-		'404':(
+		'darktip.github.user:avatar':(
+		 	'<img src="{avatar_url}" alt="{login}" title="{login}" />'
+		),
+		'darktip.github.user:headline':(
+			'{?name}<div class="headline-right realname">{name}</div>{/name}' +
+			'<div class="darktip-row headline username">{login}</div>'
+		),
+		'darktip.github.user:githubbed':(
+			'{?followers}<div class="followers">{#t count=followers}label.followers{/t}</div>{/followers}' +
+			'{?following}<div class="following">{#t count=following}label.following{/t}</div>{/following}' +
+			'{?public_repos}<div class="public_repos">{#t count=public_repos}label.public_repos{/t}</div>{/public_repos}' +
+			'{?public_gists}<div class="public_gists">{#t count=public_gists}label.public_gists{/t}</div>{/public_gists}'
+		),
+		'darktip.github.user:personals':(
+			'{?email}<div class="email">{#t email=email}label.email{/t}</div>{/email}' +
+			'{?blog}<div class="blog">{#t url=blog}label.blog{/t}</div>{/blog}' +
+			'{?company}<div class="company">{#t name=company}label.company{/t}</div>{/company}' +
+			'{?location}<div class="location">{#t location=location}label.location{/t}</div>{/location}'
+		),
+		'darktip.github.user:404':(
 			'<div class="tooltip-github-user tooltip-404">' +
-				'<div class="title">404<span class="sub"> / <%= this._loc("not-found") %></span></div>' +
-				'<div class="darktip-row"><span class="label"><%= this._loc("label.username") %></span> <span class="value"><%= this["username"] %></span></div>' +
+				'<div class="title">404<span class="sub"> / {#t}not-found{/t}</span></div>' +
+				'<div class="darktip-row">{#t name=username}label.username{/t}</div>' +
 		    '</div>'
 		)
 	},
@@ -82,30 +90,30 @@ DarkTip.registerModule('github.user', {
 			'loading'  : 'Loading GitHub user...',
 			'not-found': 'GitHub user not found',
 			'label'    : {
-				'username'    : 'User:',
-				'followers'   : 'Followers:',
-				'following'   : 'Following:',
-				'public_repos': 'Public repos:',
-				'public_gists': 'Public gists:',
-				'email'       : 'Email:',
-				'blog'        : 'Blog:',
-				'company'     : 'Company:',
-				'location'    : 'Location:'
+				'username'    : '<span class="label">User:</span> <span class="value">{name}</span>',
+				'followers'   : '<label>Followers:</label> {count}',
+				'following'   : '<label>Following:</label> {count}',
+				'public_repos': '<label>Public repos:</label> {count}',
+				'public_gists': '<label>Public gists:</label> {count}',
+				'email'       : '<label>Email:</label> {email}',
+				'blog'        : '<label>Blog:</label> {url}',
+				'company'     : '<label>Company:</label> {name}',
+				'location'    : '<label>Location:</label> {location}'
 			}
 		},
 		'de_DE': {
 			'loading'  : 'Lade GitHub Benutzer...',
 			'not-found': 'GitHub Benutzer nicht gefunden',
 			'label'    : {
-				'username'    : 'Benutzer:',
-				'followers'   : 'Gefolgt von:',
-				'following'   : 'Verfolgt:',
-				'public_repos': 'Öffentliche Repos:',
-				'public_gists': 'Öffentliche Gists:',
-				'email'       : 'E-Mail:',
-				'blog'        : 'Blog:',
-				'company'     : 'Unternehmen:',
-				'location'    : 'Standort:'
+				'username'    : '<span class="label">Benutzer:</span> <span class="value">{name}</span>',
+				'followers'   : '<label>Gefolgt von:</label> {count}',
+				'following'   : '<label>Verfolgt:</label> {count}',
+				'public_repos': '<label>Öffentliche Repos:</label> {count}',
+				'public_gists': '<label>Öffentliche Gists:</label> {count}',
+				'email'       : '<label>E-Mail:</label> {email}',
+				'blog'        : '<label>Blog:</label> {url}',
+				'company'     : '<label>Unternehmen:</label> {name}',
+				'location'    : '<label>Standort:</label> {location}'
 			}
 		}
 	}

@@ -50,7 +50,7 @@
 				return chunk.map(function(chunk) {
 					chunk.render(bodies.block, context);
 					if(typeof i18n['de_de'][chunk.data] !== 'undefined') {
-						dust.renderSource(i18n['de_de'][chunk.data], context, function(err, out) {
+						dust.renderSource(i18n['de_de'][chunk.data], base.push(params), function(err, out) {
 							chunk.data = out;
 							chunk.end();
 						});
@@ -71,7 +71,7 @@
 			},
 			'de_de': {
 				'world': 'Welt',
-				'world.39': 'Ein andere Welt, {self.name}',
+				'world.39': 'Ein andere Welt, {name}',
 				'something': 'etwas',
 				'test': 'world.39'
 			}
@@ -106,7 +106,7 @@
 		));
 		
 		dust.loadSource(dust.compile(
-			'"world" on "de_de" is: {#t}world.{user.age}{/t}, and this is missing: {#t}whatever.it.is{/t}',
+			'"world" on "de_de" is: {#t name=self.name}world.{user.age}{/t}, and this is missing: {#t}whatever.it.is{/t}',
 			'i18n'
 		));
 		

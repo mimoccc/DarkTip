@@ -90,122 +90,22 @@ window.DarkTip = {
 		},
 		
 		'templates': {
-			'tools': {
-				'_sub': function(route, data) {
-					if(typeof data === 'undefined')
-					{
-						data = this;
-					}
-					else
-					{
-						data['_meta'] = {};
-						DarkTip.jq.extend(true, data['_meta'], this['_meta']);
-					}
-					var template = DarkTip.read(this['_meta']['module'], route);
-					if(DarkTip.isTemplateString(template))
-					{
-						return DarkTip.jq.jqote(
-							template,
-							DarkTip.jq.extend(true, {}, DarkTip.getTemplateTools(this['_meta']['module'], this['_meta']['locale']), data)
-						);
-					}
-					else
-					{
-						return template;
-					}
-				},
-				'_subLoop': function(route, data, concat) {
-					if(typeof concat === 'undefined')
-					{
-						concat = '';
-					}
-					var template = DarkTip.read(this['_meta']['module'], route);
-					var collect  = [];
-					if(DarkTip.isTemplateString(template))
-					{
-						for (var i = 0; i < data.length; i++)
-						{
-							if(typeof data[i] !== 'object')
-							{
-								data[i] = { '_value': data[i] }
-							}
-							
-							data[i]['_meta'] = {};
-							DarkTip.jq.extend(true, data[i]['_meta'], this['_meta']);
-							
-							collect.push(DarkTip.jq.jqote(
-								template,
-								DarkTip.jq.extend(true, {}, DarkTip.getTemplateTools(this['_meta']['module'], this['_meta']['locale']), { '_loop': i }, data[i])
-							));
+			'base' : dust.makeBase({
+				't': function(chunk, context, bodies, params) {
+					return chunk.map(function(chunk) {
+						chunk.render(bodies.block, context);
+						if(typeof i18n['de_de'][chunk.data] !== 'undefined') {
+							dust.renderSource(i18n['de_de'][chunk.data], context, function(err, out) {
+								chunk.data = out;
+								chunk.end();
+							});
+						} else {
+							chunk.data = '[[' + chunk.data + ']]';
+							chunk.end();
 						}
-					}
-					else
-					{
-						for (var i = 0; i < data.length; i++)
-						{
-							collect.push(template);
-						}
-					}
-					return collect.join(concat);
-				},
-				'_loc': function(route, data, fuzzy) {
-					if(typeof data === 'undefined')
-					{
-						data = this;
-					}
-					else
-					{
-						data['_meta'] = {};
-						DarkTip.jq.extend(true, data['_meta'], this['_meta']);
-					}
-					var template = DarkTip.localize(this['_meta']['module'], this['_meta']['locale'], route, fuzzy);
-					if(DarkTip.isTemplateString(template))
-					{
-						return DarkTip.jq.jqote(
-							template,
-							DarkTip.jq.extend(true, {}, DarkTip.getTemplateTools(this['_meta']['module'], this['_meta']['locale']), data)
-						);
-					}
-					else
-					{
-						return template;
-					}
-				},
-				'_locLoop': function(route, data, concat) {
-					if(typeof concat === 'undefined')
-					{
-						concat = '';
-					}
-					var template = DarkTip.localize(this['_meta']['module'], this['_meta']['locale'], route);
-					var collect  = [];
-					if(DarkTip.isTemplateString(template))
-					{
-						for (var i = 0; i < data.length; i++)
-						{
-							if(typeof data[i] !== 'object')
-							{
-								data[i] = { '_value': data[i] }
-							}
-							
-							data[i]['_meta'] = {};
-							DarkTip.jq.extend(true, data[i]['_meta'], this['_meta']);
-							
-							collect.push(DarkTip.jq.jqote(
-								template,
-								DarkTip.jq.extend(true, {}, DarkTip.getTemplateTools(this['_meta']['module'], this['_meta']['locale']), { '_loop': i }, data[i])
-							));
-						}
-					}
-					else
-					{
-						for (var i = 0; i < data.length; i++)
-						{
-							collect.push(template);
-						}
-					}
-					return collect.join(concat);
+					});
 				}
-			}
+			})
 		},
 		
 		'i18n': {
@@ -793,18 +693,17 @@ window.DarkTip = {
 				
 				DarkTip.jq.each(this['queries']['sleeping'], function(key, query) {
 					
-					if(DarkTip.isTemplateString(query['condition']))
-					{
-						var result = DarkTip.compareRule(state['data'], DarkTip.jq.jqote(query['condition'], DarkTip.jq.extend(true, {}, state['repo']['params'], state['repo']['templateTools'])));
-					}
-					else
-					{
-						var result = DarkTip.compareRule(state['data'], query['condition']);
-					}
+					var result = DarkTip.compareRule(
+						state['data'],
+						dust.renderSource(
+							query['condition'],
+							DarkTip.templates.base.push(state['repo']['params'])
+						)
+					);
 					
 					if(typeof result !== 'undefined')
 					{
-						var apicall = DarkTip.jq.jqote(query['call'], DarkTip.jq.extend(true, {}, state['repo']['params'], {'condition': result}, state['repo']['templateTools']));
+						var apicall = dust.renderSource(query['call'], DarkTip.templates.base.push(state['repo']['params']).push({'condition': result}));
 						var cache   = DarkTip.cache(apicall);
 						
 						if(cache)
@@ -1188,8 +1087,6 @@ yepnope([{
 			/* jQote2 - client-side Javascript templating engine | Copyright (C) 2010, aefxx | http://aefxx.com/ | Dual licensed under the WTFPL v2 or MIT (X11) licenses | WTFPL v2 Copyright (C) 2004, Sam Hocevar | Date: Thu, Oct 21st, 2010 | Version: 0.9.7 */
 			(function($){var _=false,E1="UndefinedTemplateError",E2="TemplateCompilationError",E3="TemplateExecutionError",A="[object Array]",S="[object String]",F="[object Function]",n=1,c="%",q=/^[^<]*(<[\w\W]+>)[^>]*$/,ts=Object.prototype.toString;function r(e,x){throw ($.extend(e,x),e)}function dns(f) {var a=[];if(ts.call(f)!==A)return _;for(var i=0,l=f.length;i<l;i++)a[i]=f[i].jqote_id;return a.length?a.sort().join('.').replace(/(\b\d+\b)\.(?:\1(\.|$))+/g,"$1$2"):_}function l(s,t){var f,g=[],t=t||c,x=ts.call(s);if(x===F)return s.jqote_id?[s]:_;if(x!==A)return[$.jqotec(s,t)];if(x===A)for(var i=0,l=s.length;i<l;i++)return g.length?g:_}$.fn.extend({jqote:function(x,y){var x=ts.call(x)===A?x:[x],d="";this.each(function(i){var f=$.jqotec(this,y);for(var j=0;j<x.length;j++)d+=f.call(x[j],i,j,x,f)});return d}});$.each({app:"append",pre:"prepend",sub:"html"},function(x,y){$.fn["jqote"+x]=function(e,d,t){var p,r,s=$.jqote(e,d,t),$$=!q.test(s)?function(s){return $(document.createTextNode(s))}:$;if(!!(p=dns(l(e))))r=new RegExp("(^|\\.)"+p.split(".").join("\\.(.*)?")+"(\\.|$)");return this.each(function(){var z=$$(s);$(this)[y](z);(z[0].nodeType===3?$(this):z).trigger("jqote."+x,[z,r])})}});$.extend({jqote:function(e,d,t){var s="",t=t||c,f=l(e);if(f===_)r(new Error("Empty or undefined template passed to $.jqote"),{type:E1});d=ts.call(d)!==A?[d]:d;for(var i=0,m=f.length;i<m;i++)for(var j=0;j<d.length;j++)s+=f[i].call(d[j],i,j,d,f[i]);return s},jqotec:function(x,t){var h,e,y,t=t||c,z=ts.call(x);if(z===S&&q.test(x)){e=y=x;if(h=$.jqotecache[x])return h}else{e=z===S||x.nodeType?$(x):x instanceof jQuery?x:null;if(!e[0]||!(y=e[0].innerHTML)&&!(y=e.text()))r(new Error("Empty or undefined template passed to $.jqotec"),{type:E1});if(h=$.jqotecache[$.data(e[0],"jqote_id")])return h}var s="",i,a=y.replace(/\s*<!\[CDATA\[\s*|\s*\]\]>\s*|[\r\n\t]/g,"").split("<"+t).join(t+">\x1b").split(t+">");for(var m=0,k=a.length;m<k;m++)s+=a[m].charAt(0)!=="\x1b"?"out+='"+a[m].replace(/(\\|["'])/g,"\\$1")+"'":(a[m].charAt(1)==="="?";out+=("+a[m].substr(2)+");":(a[m].charAt(1)==="!"?";out+=$.jqotenc(("+a[m].substr(2)+"));":";"+a[m].substr(1)));s="try{"+('var out="";'+s+";return out;").split("out+='';").join("").split('var out="";out+=').join("var out=")+'}catch(e){e.type="'+E3+'";e.args=arguments;e.template=arguments.callee.toString();throw e;}';try{var f=new Function("i, j, data, fn",s)}catch(e){r(e,{type:E2})}i=e instanceof jQuery?$.data(e[0],"jqote_id",n):e;return $.jqotecache[i]=(f.jqote_id=n++,f)},jqotefn:function(e){var t=ts.call(e),i=t===S&&q.test(e)?e:$.data($(e)[0],"jqote_id");return $.jqotecache[i]||_},jqotetag:function(s){if(ts.call(s)===S)c=s},jqotenc:function(s){return s.toString().replace(/&(?!\w+;)/g,'&#38;').split('<').join('&#60;').split('>').join('&#62;').split('"').join('&#34;').split("'").join('&#39;')},jqotecache:{}});$.event.special.jqote={add:function(o){var n,h=o.handler,d=!o.data?[]:ts.call(o.data)!==A?[o.data]:o.data;if(!o.namespace)o.namespace="app.pre.sub";if(!d.length||!(n=dns(l(d))))return;o.handler=function(e,m,r){return !r||r.test(n)?h.apply(this,[e,m]):null}}}})(jQuery);
 		}
-		
-		console.log(window.dust);
 		
 		DarkTip.init();
 	}
