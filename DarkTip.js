@@ -94,13 +94,14 @@ window.DarkTip = {
 				't': function(chunk, context, bodies, params) {
 					return chunk.map(function(chunk) {
 						chunk.render(bodies.block, context);
-						if(typeof i18n['de_de'][chunk.data] !== 'undefined') {
-							dust.renderSource(i18n['de_de'][chunk.data], context, function(err, out) {
+						var loc = Darktip.localize(base['meta']['module'], base['meta']['locale'], chunk.data, (params.fuzzy || 0));
+						if(loc) {
+							dust.renderSource(loc, base.push(params).push(context.current()), function(err, out) {
 								chunk.data = out;
 								chunk.end();
 							});
 						} else {
-							chunk.data = '[[' + chunk.data + ']]';
+							chunk.data = '[#t ![' + chunk.data + ']]';
 							chunk.end();
 						}
 					});
@@ -112,8 +113,8 @@ window.DarkTip = {
 			'en_US': {
 				'loading'         : 'Loading...',
 				'not-found'       : 'Nothing found',
-				'extendedInactive': 'Hold [<%= this["_meta"]["extendedKeyCodeLabel"] %>] to switch modes',
-				'extendedActive'  : 'Release [<%= this["_meta"]["extendedKeyCodeLabel"] %>] to switch modes'
+				'extendedInactive': 'Hold [{meta.extendedKeyCodeLabel}] to switch modes',
+				'extendedActive'  : 'Release [{meta.extendedKeyCodeLabel}] to switch modes'
 			},
 			'en_GB': {
 				'meta': {
@@ -123,20 +124,20 @@ window.DarkTip = {
 			'de_DE': {
 				'loading'         : 'Laden...',
 				'not-found'       : 'Nichts gefunden',
-				'extendedInactive': '[<%= this["_meta"]["extendedKeyCodeLabel"] %>] gedrückt halten um den Modus zu wechseln',
-				'extendedActive'  : '[<%= this["_meta"]["extendedKeyCodeLabel"] %>] loslassen um den Modus zu wechseln!'
+				'extendedInactive': '[{meta.extendedKeyCodeLabel}] gedrückt halten um den Modus zu wechseln',
+				'extendedActive'  : '[{meta.extendedKeyCodeLabel}] loslassen um den Modus zu wechseln!'
 			},
 			'fr_FR': {
 				'loading'         : 'Chargement...',
 				'not-found'       : 'Aucun résultat',
-				'extendedInactive': 'Appuyer [<%= this["_meta"]["extendedKeyCodeLabel"] %>] pour changer de mode',
-				'extendedActive'  : 'Relacher [<%= this["_meta"]["extendedKeyCodeLabel"] %>] pour changer de mode'
+				'extendedInactive': 'Appuyer [{meta.extendedKeyCodeLabel}] pour changer de mode',
+				'extendedActive'  : 'Relacher [{meta.extendedKeyCodeLabel}] pour changer de mode'
 			},
 			'es_ES': {
 				'loading'         : 'Cargando...',
 				'not-found'       : 'No he encontrado nada',
-				'extendedInactive': '¡Manten pulsado [<%= this["_meta"]["extendedKeyCodeLabel"] %>] para cambiar de modo!',
-				'extendedActive'  : '¡Suelta [<%= this["_meta"]["extendedKeyCodeLabel"] %>] para cambiar de modo!'
+				'extendedInactive': '¡Manten pulsado [{meta.extendedKeyCodeLabel}] para cambiar de modo!',
+				'extendedActive'  : '¡Suelta [{meta.extendedKeyCodeLabel}] para cambiar de modo!'
 			},
 			'es_MX': {
 				'meta': {
