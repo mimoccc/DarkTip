@@ -50,12 +50,12 @@
 				return chunk.map(function(chunk) {
 					chunk.render(bodies.block, context);
 					if(typeof i18n['de_de'][chunk.data] !== 'undefined') {
-						dust.renderSource(i18n['de_de'][chunk.data], base.push(params), function(err, out) {
+						dust.renderSource(i18n['de_de'][chunk.data], base.push(params).push(context.current()), function(err, out) {
 							chunk.data = out;
 							chunk.end();
 						});
 					} else {
-						chunk.data = 'Missing translation: "' + chunk.data + '"';
+						chunk.data = '[#t ![' + chunk.data + ']]';
 						chunk.end();
 					}
 				});
@@ -92,11 +92,11 @@
 		
 		dust.loadSource(dust.compile(
 			'{sayHello} {user.firstname}, I hope you are feeling {user.mood}.',
-			'greeting'
+			'greeting_blubb'
 		));
 		
 		dust.loadSource(dust.compile(
-			'This is a header!<br /><br />{>greeting/}<br /><br />That\'s all for now, {self.name}!',
+			'This is a header!<br /><br />{>greeting_blubb/}<br /><br />That\'s all for now, {self.name}!',
 			'header'
 		));
 		
@@ -106,14 +106,14 @@
 		));
 		
 		dust.loadSource(dust.compile(
-			'"world" on "de_de" is: {#t name=self.name}world.{user.age}{/t}, and this is missing: {#t}whatever.it.is{/t}',
+			'"world.{user.age}" on "de_de" is: {#t name=self.name}world.{user.age}{/t}, and this is missing: {#t}whatever.it.is{/t}',
 			'i18n'
 		));
 		
-		dust.render('greeting', base.push(data), function(err, out) { jQuery('#testing-1').html(out); });
-		dust.render('header',   base.push(data), function(err, out) { jQuery('#testing-2').html(out); });
-		dust.render('taglist',  base.push(data), function(err, out) { jQuery('#testing-3').html(out); });
-		dust.render('i18n',     base.push(data), function(err, out) { jQuery('#testing-4').html(out); });
+		dust.render('greeting_blubb', base.push(data), function(err, out) { jQuery('#testing-1').html(out); });
+		dust.render('header',         base.push(data), function(err, out) { jQuery('#testing-2').html(out); });
+		dust.render('taglist',        base.push(data), function(err, out) { jQuery('#testing-3').html(out); });
+		dust.render('i18n',           base.push(data), function(err, out) { jQuery('#testing-4').html(out); });
 		
 	</script>
 </body>

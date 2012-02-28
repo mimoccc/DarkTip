@@ -13,7 +13,7 @@ DarkTip.registerModule('github.user', {
 		'user': {
 			'required' : true,
 			'condition': true,
-			'call'     : 'https://api.github.com/users/<%= this["username"] %>'
+			'call'     : 'https://api.github.com/users/{username}'
 		}
 	},
 	
@@ -22,12 +22,6 @@ DarkTip.registerModule('github.user', {
 			var params = DarkTip.mapRegex(result, DarkTip._read(DarkTip.route('github.user', 'triggers.explicit.params')));
 			return params;
 		}
-		/*
-		'implicit': function(result) {
-			var params = DarkTip.mapRegex(result, DarkTip._read(DarkTip.route('youtube.video', 'triggers.implicit.params')));
-			return params;
-		}
-		*/
 	},
 	
 	'prepareData': function(state) {
@@ -47,37 +41,37 @@ DarkTip.registerModule('github.user', {
 	},
 	
 	'templates': {
-		'darktip.github.user:main':(
+		'github_user_main':(
 			'<div class="tooltip-github-user">' +
-				'<div class="avatar">{>darktip.github.user:avatar}</div>' +
+				'<div class="avatar">{>github_user_avatar}</div>' +
 				'<div class="col-98">' +
-					'{>darktip.github.user:headline}' +
-					'<div class="githubbed">{>darktip.github.user:githubbed}</div>' +
-					'<div class="personals">{>darktip.github.user:personals}</div>' +
+					'{>github_user_headline}' +
+					'<div class="githubbed">{>github_user_githubbed}</div>' +
+					'<div class="personals">{>github_user_personals}</div>' +
 				'</div>' +
 				'{?bio}<div class="darktip-row bio">{bio}</div>{/bio}' +
 			'</div>'				
 		),
-		'darktip.github.user:avatar':(
+		'github_user_avatar':(
 		 	'<img src="{avatar_url}" alt="{login}" title="{login}" />'
 		),
-		'darktip.github.user:headline':(
+		'github_user_headline':(
 			'{?name}<div class="headline-right realname">{name}</div>{/name}' +
 			'<div class="darktip-row headline username">{login}</div>'
 		),
-		'darktip.github.user:githubbed':(
+		'github_user_githubbed':(
 			'{?followers}<div class="followers">{#t count=followers}label.followers{/t}</div>{/followers}' +
 			'{?following}<div class="following">{#t count=following}label.following{/t}</div>{/following}' +
 			'{?public_repos}<div class="public_repos">{#t count=public_repos}label.public_repos{/t}</div>{/public_repos}' +
 			'{?public_gists}<div class="public_gists">{#t count=public_gists}label.public_gists{/t}</div>{/public_gists}'
 		),
-		'darktip.github.user:personals':(
+		'github_user_personals':(
 			'{?email}<div class="email">{#t email=email}label.email{/t}</div>{/email}' +
 			'{?blog}<div class="blog">{#t url=blog}label.blog{/t}</div>{/blog}' +
 			'{?company}<div class="company">{#t name=company}label.company{/t}</div>{/company}' +
 			'{?location}<div class="location">{#t location=location}label.location{/t}</div>{/location}'
 		),
-		'darktip.github.user:404':(
+		'github_user_404':(
 			'<div class="tooltip-github-user tooltip-404">' +
 				'<div class="title">404<span class="sub"> / {#t}not-found{/t}</span></div>' +
 				'<div class="darktip-row">{#t name=username}label.username{/t}</div>' +
