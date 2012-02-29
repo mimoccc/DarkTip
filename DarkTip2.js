@@ -3,7 +3,7 @@
  * quick and easy development of modules that hook into specific aspects of a
  * webpage and display context sensitive tooltips.
  * 
- * Copyright (C) 2011  Martin Gelder
+ * Copyright (C) 2012  Martin Gelder
  * (darkspotinthecorner {at} gmail {dot} com)
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,24 @@ if(!window.yepnope)
 
 }
 
-var DarkTip = Object.create(null);
+DarkTip = {
+	/* Class functions */
+	'Module'        : function(settings) {
+		this.settings = settings;
+	},
+	
+	/* Object functions */
+	'initialize'    : function() {},
+	'registerModule': function(settings) {
+		var module = new this.Module(settings);
+		return module;
+	},
+	'cacheHighLevel': function(module, trigger, result) {},
+	'cacheLowLevel' : function(apicall, result) {},
+	
+};
+
+var test = DarkTip.registerModule({'aaa': 111, 'bbb': 222, 'ccc': {'dd': 44, 'ee': 55}});
 
 
-console.log(window.yepnope);
+console.log(test);
