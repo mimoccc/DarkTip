@@ -4,33 +4,33 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>DarkTip - Test Suite</title>
 	<style type="text/css">
-		
+
 		* {
 			padding: 0;
 			margin: 0;
 		}
-		
+
 		body {
 			font-family: sans-serif;
 			font-size: 12px;
 			line-height: 150%;
 		}
-		
+
 		div.testing {
 			border: 2px solid #999;
 			background-color: #eee;
 			margin: 10px;
 			padding: 2px 4px;
 		}
-		
+
 	</style>
 </head>
 <body>
-	
+
 	<p>
 		Testing dust.js
 	</p>
-	
+
 	<div class="testing" id="testing-1"></div>
 	<div class="testing" id="testing-2"></div>
 	<div class="testing" id="testing-3"></div>
@@ -40,17 +40,17 @@
 	<div class="testing" id="testing-7"></div>
 	<div class="testing" id="testing-8"></div>
 	<div class="testing" id="testing-9"></div>
-	
+
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-	<script type="text/javascript" src="dustjs/dust-full-0.3.0.min.js"></script>
+	<script type="text/javascript" src="ext/dustjs/dust-full-1.0.0.js"></script>
 	<script type="text/javascript">
-		
+
 		var base = dust.makeBase({
 			't': function(chunk, context, bodies, params) {
 				return chunk.map(function(chunk) {
 					chunk.render(bodies.block, context);
 					if(typeof i18n['de_de'][chunk.data] !== 'undefined') {
-						dust.renderSource(i18n['de_de'][chunk.data], base.push(params).push(context.current()), function(err, out) {
+						dust.renderSource(i18n['de_de'][chunk.data], base.push(context.current()).push(params), function(err, out) {
 							chunk.data = out;
 							chunk.end();
 						});
@@ -61,7 +61,7 @@
 				});
 			},
 		});
-		
+
 		var i18n = {
 			'en_us': {
 				'world': 'world',
@@ -76,8 +76,9 @@
 				'test': 'world.39'
 			}
 		};
-		
+
 		var data = {
+			'name': 'Blargs!',
 			'self': {
 				'name': 'dsitc'
 			},
@@ -89,32 +90,38 @@
 			},
 			'tags': ['super', 'great', 'awesome', 'spectacular', 'unbelieveable', 'sleek']
 		};
-		
+
 		dust.loadSource(dust.compile(
 			'{sayHello} {user.firstname}, I hope you are feeling {user.mood}.',
 			'greeting_blubb'
 		));
-		
+
 		dust.loadSource(dust.compile(
 			'This is a header!<br /><br />{>greeting_blubb/}<br /><br />That\'s all for now, {self.name}!',
 			'header'
 		));
-		
+
 		dust.loadSource(dust.compile(
 			'{?tags}<div class="taglist">{#tags}{.}{@sep}, {/sep}{/tags}</div>{:else}<div class="taglist empty">No tags!</div>{/tags}',
 			'taglist'
 		));
-		
+
 		dust.loadSource(dust.compile(
 			'"world.{user.age}" on "de_de" is: {#t name=self.name}world.{user.age}{/t}, and this is missing: {#t}whatever.it.is{/t}',
 			'i18n'
 		));
-		
+
+		dust.loadSource(dust.compile(
+			'',
+			'objtest'
+		));
+
 		dust.render('greeting_blubb', base.push(data), function(err, out) { jQuery('#testing-1').html(out); });
 		dust.render('header',         base.push(data), function(err, out) { jQuery('#testing-2').html(out); });
 		dust.render('taglist',        base.push(data), function(err, out) { jQuery('#testing-3').html(out); });
 		dust.render('i18n',           base.push(data), function(err, out) { jQuery('#testing-4').html(out); });
-		
+		dust.render('objtest',        base.push(data), function(err, out) { jQuery('#testing-5').html(out); });
+
 	</script>
 </body>
 </html>
