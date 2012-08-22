@@ -1,0 +1,21 @@
+Design by Usecase
+
+
+Template:
+
+
+<div class="diablo3 career">
+	<div class="battletag">
+		<span class="battletag-name">{{d3.career.battletag.name}}</span>#<span class="battletag-code">{{d3.career.battletag.code}}</span>
+	</div>
+	<div class="timeplayed">
+		<div class="barbarian">{{d3.career.timeplayed.barbarian}}</div>
+		<div class="demon-hunter">{{d3.career.timeplayed.demon-hunter}}</div>
+		<div class="monk">{{d3.career.timeplayed.monk}}</div>
+		<div class="witch-doctor">{{d3.career.timeplayed.witch-doctor}}</div>
+		<div class="wizard">{{d3.career.timeplayed.wizard}}</div>
+	</div>
+</div>
+
+
+The system encounters a tag, e.g. {{d3.career.battletag.name}} 
