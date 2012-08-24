@@ -35,13 +35,19 @@
 	<script type="text/javascript" src="DarkTip2.js"></script>
 	<script type="text/javascript">
 
-		var module1 = window.DarkTip['registerModule'](null, 'd3', {'options': {'width': '20em'}});
-		var module2 = window.DarkTip['registerModule'](null, 'd4');
+		var module_d3 = window.DarkTip.registerModule(null, 'd3', {
+			'options': {
+				'layout': {
+					'width': {
+						'core': 400
+					}
+				}
+			}
+		});
 
-		window.DarkTip['log'](module1['options']['narf']);
-		window.DarkTip['log'](module2['options']['narf']);
+		window.DarkTip.log(module_d3.options.triggers.explicit);
 
-		window.DarkTip['log'](window.DarkTip);
+		// window.DarkTip['log'](window.DarkTip);
 
 	</script>
 </body>

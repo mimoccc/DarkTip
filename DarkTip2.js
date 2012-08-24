@@ -24,69 +24,90 @@
 
 	window.DarkTip = {};
 
-	window.DarkTip['log'] = function(stuff) {
+	window.DarkTip.log = function(stuff) {
 
 		console.log(stuff);
 
 	};
 
-	window.DarkTip['modules'] = {};
+	window.DarkTip.modules = {};
 
-	window.DarkTip['modules']['base'] = {
+	window.DarkTip.modules.base = {
 		'options': {
-			'width': '400px',
-			'narf': 'blubb'
+			'triggers': {
+				'implicit': true,
+				'explicit': true
+			},
+			'extendedMode': {
+				'active'      : true,
+				'keyCode'     : 16,
+				'keyCodeLabel': 'SHIFT'
+			},
+			'layout': {
+				'position': {
+					'my'    : 'bottom middle',
+					'at'    : 'top middle',
+					'target': false
+				},
+				'width': {
+					'core': 300,
+					'404' : 250
+				}
+			}
 		}
 	};
 
-	/*
-		define custom getter:
-			if key is undefined, lookup in prototype
-	*/
-	/*
-	window.DarkTip['modules']['base'].__defineGetter__('options', function(){
-		console.log('custom getter of base called!');
-		return options;
-	});
-	*/
+	window.DarkTip.linkDeep = function(obj, proto) {
+		for(var key in obj) {
+			if(obj.hasOwnProperty(key)) {
+				if((typeof obj[key] === 'object') && (typeof proto[key] === 'object')) {
+					obj[key]['__proto__'] = proto[key];
+					window.DarkTip.linkDeep(obj[key], proto[key]);
+				}
+			}
+		}
+	};
 
-
-	window.DarkTip['registerModule'] = function(proto, name, data) {
+	window.DarkTip.registerModule = function(proto, name, data) {
 
 		data = (typeof data === 'object') ? data : {};
 
 		// Check if the module name is a string, if not, cancel
 		if(typeof name !== 'string') {
 
+			window.DarkTip.log('Module name is no string!');
+
 			return undefined;
 
 		}
 
 		// Check if the module name is still available, if not, cancel
-		if(typeof window.DarkTip['modules'][name] !== 'undefined') {
+		if(typeof window.DarkTip.modules[name] !== 'undefined') {
 
-			window.DarkTip['log']('Module name "' + name + '" is already in use!');
+			window.DarkTip.log('Module name "' + name + '" is already in use!');
 
 			return undefined;
 
 		}
 
 		// Check if the prototype module is available , if not, fall back to the base module prototype
-		if(typeof window.DarkTip['modules'][proto] !== 'object') {
+		if(typeof window.DarkTip.modules[proto] !== 'object') {
 
-			proto = window.DarkTip['modules']['base'];
+			proto = window.DarkTip.modules['base'];
 
 		}
 
-		window.DarkTip['modules'][name] = Object.create(proto);
+		window.DarkTip.modules[name] = Object.create(proto);
 
 		for(var key in data) {
 			if(data.hasOwnProperty(key)) {
-				window.DarkTip['modules'][name][key] = data[key];
+				window.DarkTip.modules[name][key] = data[key];
 			}
 		}
 
-		return window.DarkTip['modules'][name];
+		window.DarkTip.linkDeep(window.DarkTip.modules[name], Object.getPrototypeOf(window.DarkTip.modules[name]));
+
+		return window.DarkTip.modules[name];
 	};
 
 })(this, document);
