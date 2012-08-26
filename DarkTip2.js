@@ -30,77 +30,160 @@
 
 	};
 
+	window.DarkTip.version = {
+		'major': 2,
+		'minor': 0,
+		'patch': 0
+	};
+
+	window.DarkTip.options = {
+		'debug': true,
+	};
+
 	window.DarkTip.modules = {};
 
-	window.DarkTip.modules.base = {
-		'options': {
-			'triggers': {
+	window.DarkTip.modules['base'] = {
+		'options':
+		{
+			'triggers':
+			{
 				'implicit': true,
 				'explicit': true
 			},
-			'extendedMode': {
+			'extendedMode':
+			{
 				'active'      : true,
 				'keyCode'     : 16,
 				'keyCodeLabel': 'SHIFT'
 			},
-			'layout': {
-				'position': {
+			'layout':
+			{
+				'position':
+				{
 					'my'    : 'bottom middle',
 					'at'    : 'top middle',
 					'target': false
 				},
-				'width': {
+				'width':
+				{
 					'core': 300,
 					'404' : 250
 				}
 			}
+		},
+		'templates':
+		{
+			'core': '',
+			'404' : ''
+		},
+		'i18n':
+		{
+			'en_US':
+			{
+				'loading'         : 'Loading...',
+				'not-found'       : 'Nothing found',
+				'extendedInactive': 'Hold [{options.extendedMode.keyCodeLabel}] to switch modes',
+				'extendedActive'  : 'Release [{options.extendedMode.keyCodeLabel}] to switch modes'
+			},
+			'en_GB':
+			{
+				'meta':
+				{
+					'redirect': 'en_US'
+				}
+			},
+			'de_DE':
+			{
+				'loading'         : 'Laden...',
+				'not-found'       : 'Nichts gefunden',
+				'extendedInactive': '[{options.extendedMode.keyCodeLabel}] gedrückt halten um den Modus zu wechseln',
+				'extendedActive'  : '[{options.extendedMode.keyCodeLabel}] loslassen um den Modus zu wechseln!'
+			},
+			'fr_FR':
+			{
+				'loading'         : 'Chargement...',
+				'not-found'       : 'Aucun résultat',
+				'extendedInactive': 'Appuyer [{options.extendedMode.keyCodeLabel}] pour changer de mode',
+				'extendedActive'  : 'Relacher [{options.extendedMode.keyCodeLabel}] pour changer de mode'
+			},
+			'es_ES':
+			{
+				'loading'         : 'Cargando...',
+				'not-found'       : 'No he encontrado nada',
+				'extendedInactive': '¡Manten pulsado [{options.extendedMode.keyCodeLabel}] para cambiar de modo!',
+				'extendedActive'  : '¡Suelta [{options.extendedMode.keyCodeLabel}] para cambiar de modo!'
+			},
+			'es_MX':
+			{
+				'meta':
+				{
+					'fallback': 'es_ES'
+				}
+			},
+			'ru_RU':
+			{
+			},
+			'ko_KR':
+			{
+			},
+			'zh_TW':
+			{
+			},
+			'zh_CN':
+			{
+			}
 		}
 	};
 
-	window.DarkTip.linkDeep = function(obj, proto) {
-		for(var key in obj) {
-			if(obj.hasOwnProperty(key)) {
-				if((typeof obj[key] === 'object') && (typeof proto[key] === 'object')) {
+	window.DarkTip.linkDeep = function(obj, proto)
+	{
+		for (var key in obj)
+		{
+			if (obj.hasOwnProperty(key))
+			{
+				if ((typeof obj[key] === 'object') && (typeof proto[key] === 'object'))
+				{
 					obj[key]['__proto__'] = proto[key];
+
 					window.DarkTip.linkDeep(obj[key], proto[key]);
 				}
 			}
 		}
 	};
 
-	window.DarkTip.registerModule = function(proto, name, data) {
+	window.DarkTip.registerModule = function(proto, name, data)
+	{
 
 		data = (typeof data === 'object') ? data : {};
 
 		// Check if the module name is a string, if not, cancel
-		if(typeof name !== 'string') {
-
+		if (typeof name !== 'string')
+		{
 			window.DarkTip.log('Module name is no string!');
 
 			return undefined;
-
 		}
 
 		// Check if the module name is still available, if not, cancel
-		if(typeof window.DarkTip.modules[name] !== 'undefined') {
-
+		if (typeof window.DarkTip.modules[name] !== 'undefined')
+		{
 			window.DarkTip.log('Module name "' + name + '" is already in use!');
 
 			return undefined;
-
 		}
 
 		// Check if the prototype module is available , if not, fall back to the base module prototype
-		if(typeof window.DarkTip.modules[proto] !== 'object') {
-
+		if (typeof window.DarkTip.modules[proto] !== 'object')
+		{
 			proto = window.DarkTip.modules['base'];
-
 		}
 
 		window.DarkTip.modules[name] = Object.create(proto);
 
-		for(var key in data) {
-			if(data.hasOwnProperty(key)) {
+		for (var key in data)
+		{
+			if (data.hasOwnProperty(key))
+			{
 				window.DarkTip.modules[name][key] = data[key];
 			}
 		}
@@ -111,3 +194,4 @@
 	};
 
 })(this, document);
+
