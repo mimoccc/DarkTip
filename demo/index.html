@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>DarkTip Demo</title>
+		<script src="../dist/DarkTip.js" type="text/javascript" type="text/javascript"></script>
+		<script type="text/javascript">
+
+			DarkTip.addLocale('en');
+			DarkTip.addLocale('de');
+
+			DarkTip.addLocaleString('en', 'elements_remaining', 'There is {num_elements, plural, one {one element} other {# elements}} remaining');
+
+			dust.helpers.i18n = function(chunk, context, bodies, params)
+			{
+				var message = params.message;
+
+				return chunk.write(DarkTip.getLocaleString('en', message, params));
+			}
+
+			dust.loadSource(dust.compile('Hello {name}! {@i18n message="elements_remaining" num_elements=element_count /}.', 'test_a'));
+
+			jQuery(function()
+			{
+				// jQuery('#target').text(message_container['elements_remaining']({'num_elements': 12}));
+
+				data = {
+					'name'         : 'Fred',
+					'element_count': 42
+				};
+
+				dust.render('test_a', data, function(err, out)
+				{
+					jQuery('#target').text(out);
+					// console.log(out);
+				});
+
+			});
+
+		</script>
+	</head>
+	<body>
+		<div id="target"></div>
+	</body>
+</html>

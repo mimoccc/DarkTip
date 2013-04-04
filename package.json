@@ -1,0 +1,29 @@
+{
+  "name": "DarkTip",
+  "title": "DarkTip",
+  "description": "Javascript Tooltip framework for accessing restful apis.",
+  "version": "0.1.0",
+  "homepage": "",
+  "author": {
+    "name": "Martin Gelder",
+    "email": "darkspotinthecorner@gmail.com",
+    "url": "http://www.dsitc.de"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/darkspotinthecorner/DarkTip2.git"
+  },
+  "bugs": {
+    "url": "https://github.com/darkspotinthecorner/DarkTip2/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "/blob/master/LICENSE-MIT"
+    }
+  ],
+  "dependencies": {
+    "jquery": "1.9.0"
+  },
+  "keywords": []
+}
