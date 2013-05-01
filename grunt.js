@@ -12,9 +12,6 @@ module.exports = function(grunt) {
         ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */'
     },
     code: {
-      outer_closure_start: 'var DarkTip = (function (window, document, undefined) {',
-      outer_closure_end: 'return DarkTip; })(window, window.document);',
-
       check_yepnope_start      : 'if(!window.yepnope) {',
       check_yepnope_end        : '}',
       check_jquery_start       : 'if(!window.jQuery || window.jQuery().jquery < \'1.9.0\') {',
@@ -48,9 +45,7 @@ module.exports = function(grunt) {
             '<banner:code.check_messageformat_end>',
             // '<banner:code.check_spinner_start>', 'vendor/spin.js/spin.min.js', '<banner:code.check_spinner_end>',
             // '<banner:code.check_opentip_start>', 'vendor/opentip/min/opentip-jquery.js', '<banner:code.check_opentip_end>',
-            '<banner:code.outer_closure_start>',
-            '<file_strip_banner:lib/<%= pkg.name %>.js>',
-            '<banner:code.outer_closure_end>'
+            '<file_strip_banner:lib/<%= pkg.name %>.js>'
         ],
         dest: 'dist/<%= pkg.name %>.js'
       }
@@ -85,6 +80,7 @@ module.exports = function(grunt) {
   });
 
   // Default task.
-  grunt.registerTask('default', 'lint qunit concat min');
+  grunt.registerTask('default', 'lint qunit concat');
+  // grunt.registerTask('default', 'lint qunit concat min');
 
 };

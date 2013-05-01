@@ -11,6 +11,35 @@
 
 			DarkTip.addLocaleString('en', 'elements_remaining', 'There is {num_elements, plural, one {one element} other {# elements}} remaining');
 
+			DarkTip.registerModule({
+				'name'    : 'wow',
+				'triggergroups': {
+					'implicit': {
+						'selector' : 'a[href]',
+						'extractor': function(element) { return new String(element.attr('href')); }
+					},
+					'explicit': {
+						'selector' : '[data-darktip]',
+						'extractor': function(element) { return new String(element.data('darktip')); }
+					}
+				},
+				'triggers': {
+					'implicit': [
+						{
+							'tester'   : /aaaa/i,
+							'paramizer': { 1: 'a', 2: 'b' }
+						},
+						{
+							'tester': /abab/i,
+							'paramizer': 111
+						}
+					]
+				}
+			});
+
+			DarkTip.init();
+
+			/*
 			dust.helpers.i18n = function(chunk, context, bodies, params)
 			{
 				var message = params.message;
@@ -36,6 +65,7 @@
 				});
 
 			});
+			// */
 
 		</script>
 	</head>
