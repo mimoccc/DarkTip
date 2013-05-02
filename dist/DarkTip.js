@@ -1,4 +1,4 @@
-/*! DarkTip - v0.1.0 - 2013-04-09
+/*! DarkTip - v0.1.0 - 2013-05-02
 * Copyright (c) 2013 ; Licensed MIT */
 
 if(!window.jQuery || window.jQuery().jquery < '1.9.0') {
@@ -15131,8 +15131,8 @@ MessageFormat.locale.de = function ( n ) {
 };
 }
 
-var DarkTip = (function (window, document, undefined) {
-
+var DarkTip = (function (window, document, undefined)
+{
 	var console = window.console || { 'log': function(message) { return false; }};
 
 	var Factory = {
@@ -15146,7 +15146,97 @@ var DarkTip = (function (window, document, undefined) {
 		}
 	};
 
-	var DarkTip = {
+	var TriggerGroup = function(name, data)
+	{
+		this.triggers = [];
+
+		if (Core.isUndefined(name)) { throw new Error('trigger group register >>> required parameter "name" is missing'); }
+		if (!Core.isString(name)) { throw new Error('trigger group register >>> required parameter "name" must be a string'); }
+		if (Core.isTriggerGroupRegistered(name)) { throw new Error('trigger group register >>> name "' + name + '" already exists'); }
+
+		if (Core.isUndefined(data)) { throw new Error('trigger group regsiter (' + name + ') >>> required parameter "data" is missing'); }
+		if (!Core.isObject(data)) { throw new Error('trigger group regsiter (' + name + ') >>> required parameter "data" must be an object'); }
+
+		if (Core.isUndefined(data['selector'])) { throw new Error('trigger group register (' + name + ') >>> required parameter "data.selector" is missing'); }
+		if (!Core.isString(data['selector'])) { throw new Error('trigger group register (' + name + ') >>> required parameter "data.selector" must be a string'); }
+
+		if (Core.isUndefined(data['extractor'])) { throw new Error('trigger group register (' + name + ') >>> required parameter "data.extractor" is missing'); }
+		if (!Core.isFunction(data['extractor'])) { throw new Error('trigger group register (' + name + ') >>> required parameter "data.extractor" must be a function'); }
+
+		this.addTrigger = function(trigger)
+		{
+			this.triggers.push(trigger);
+
+			console.log('added trigger to triggergroup "' + name + '".');
+			console.log(trigger);
+		};
+
+		this.findTrigger = function(element)
+		{
+			var triggercount = this.triggers.length;
+			var testthis     = data['extractor'](element);
+
+			for (var i = (triggercount - 1); i >= 0; i--)
+			{
+				var result = this.triggers[i].doesApply(testthis);
+
+				if (result)
+				{
+					var params = this.triggers[i].getParams(result);
+
+					Core.initTooltip();
+
+					break;
+				}
+			}
+		};
+
+		// func: get trigger to apply (later added = higher priority)
+	};
+
+	var Trigger = function(module, triggergroup, data)
+	{
+		if (Core.isUndefined(module)) { throw new Error('trigger regsiter >>> required parameter "module" is missing'); }
+
+		if (Core.isUndefined(triggergroup)) { throw new Error('trigger regsiter (' + module + ') >>> required parameter "triggergroup" is missing'); }
+		if (!Core.isTriggerGroupRegistered(triggergroup)) { throw new Error('trigger regsiter (' + module + ') >>> triggergroup "' + triggergroup + '" does not exist'); }
+
+		if (Core.isUndefined(data)) { throw new Error('trigger regsiter (' + module + ':' + triggergroup + ') >>> required parameter "data" is missing'); }
+		if (!Core.isObject(data)) { throw new Error('trigger regsiter (' + module + ':' + triggergroup + ') >>> parameter "data" must be an object'); }
+
+		if (Core.isUndefined(data['tester'])) { throw new Error('trigger register (' + module + ':' + triggergroup + ') >>> required parameter "data.tester" is missing'); }
+		if (!Core.isFunction(data['tester']) && !Core.isRegExp(data['tester'])) { throw new Error('trigger register (' + module + ':' + triggergroup + ') >>> parameter "data.tester" must be a regular expression or function'); }
+
+		if (Core.isUndefined(data['paramizer'])) { throw new Error('trigger register (' + module + ':' + triggergroup + ') >>> required parameter "data.paramizer" is missing'); }
+		if (!Core.isFunction(data['paramizer']) && !Core.isObject(data['paramizer'])) { throw new Error('trigger register (' + module + ':' + triggergroup + ') >>> parameter "data.paramizer" must be a function or object'); }
+
+		if (Core.isObject(data['paramizer']) && !Core.isRegExp(data['tester'])) { throw new Error('trigger register (' + module + ':' + triggergroup + ') >>> parameter "data.paramizer" must be a function unless "data.tester" is a regular expession'); }
+
+		this.module = module;
+
+		if (Core.isRegExp(data['tester']))
+		{
+			this.doesApply = function(testthis)
+			{
+				return String(testthis).match(data['tester']);
+			};
+		}
+		else
+		{
+			this.doesApply = data['tester'];
+		}
+
+		if (Core.isObject(data['paramizer']))
+		{
+			this.getParams = function() {};
+		}
+		else
+		{
+			this.getParams = data['paramizer'];
+		}
+	};
+
+	var Core = {
 
 		/* ****************************************************** *\
 		 * Startup
@@ -15194,43 +15284,16 @@ var DarkTip = (function (window, document, undefined) {
 
 		'registerTriggerGroup': function(name, data)
 		{
-			if (this.isUndefined(name))              { throw new Error('trigger group register >>> required parameter "name" is missing'); }
-			if (!this.isString(name))                { throw new Error('trigger group register >>> required parameter "name" must be a string'); }
-			if (this.isTriggerGroupRegistered(name)) { throw new Error('trigger group register >>> name "' + name + '" already exists'); }
+			var triggergroup = new TriggerGroup(name, data);
 
-			if (this.isUndefined(data))              { throw new Error('trigger group regsiter (' + name + ') >>> required parameter "data" is missing'); }
-			if (!this.isObject(data))                { throw new Error('trigger group regsiter (' + name + ') >>> required parameter "data" must be an object'); }
-
-			if (this.isUndefined(data['selector']))  { throw new Error('trigger group register (' + name + ') >>> required parameter "data.selector" is missing'); }
-			if (!this.isString(data['selector']))    { throw new Error('trigger group register (' + name + ') >>> required parameter "data.selector" must be a string'); }
-
-			if (this.isUndefined(data['extractor'])) { throw new Error('trigger group register (' + name + ') >>> required parameter "data.extractor" is missing'); }
-			if (!this.isFunction(data['extractor'])) { throw new Error('trigger group register (' + name + ') >>> required parameter "data.extractor" must be a function'); }
-
-			this.triggergroups[name] = data;
+			this.triggergroups[name] = triggergroup;
 		},
-
-		'triggers': {},
 
 		'registerTrigger': function(module, triggergroup, data)
 		{
-			if (this.isUndefined(module))                                                 { throw new Error('trigger regsiter >>> required parameter "module" is missing'); }
+			var trigger = new Trigger(module, triggergroup, data);
 
-			if (this.isUndefined(triggergroup))                                           { throw new Error('trigger regsiter (' + module + ') >>> required parameter "triggergroup" is missing'); }
-			if (!this.isTriggerGroupRegistered(triggergroup))                             { throw new Error('trigger regsiter (' + module + ') >>> triggergroup "' + triggergroup + '" does not exist'); }
-
-			if (this.isUndefined(data))                                                   { throw new Error('trigger regsiter (' + module + ':' + triggergroup + ') >>> required parameter "data" is missing'); }
-			if (!this.isObject(data))                                                     { throw new Error('trigger regsiter (' + module + ':' + triggergroup + ') >>> parameter "data" must be an object'); }
-
-			if (this.isUndefined(data['tester']))                                         { throw new Error('trigger register (' + module + ':' + triggergroup + ') >>> required parameter "data.tester" is missing'); }
-			if (!this.isFunction(data['tester']) && !this.isRegExp(data['tester']))       { throw new Error('trigger register (' + module + ':' + triggergroup + ') >>> parameter "data.tester" must be a regular expression or function'); }
-
-			if (this.isUndefined(data['paramizer']))                                      { throw new Error('trigger register (' + module + ':' + triggergroup + ') >>> required parameter "data.paramizer" is missing'); }
-			if (!this.isFunction(data['paramizer']) && !this.isObject(data['paramizer'])) { throw new Error('trigger register (' + module + ':' + triggergroup + ') >>> parameter "data.paramizer" must be a function or object'); }
-
-			if (this.isObject(data['paramizer']) && !this.isRegExp(data['tester']))       { throw new Error('trigger register (' + module + ':' + triggergroup + ') >>> parameter "data.paramizer" must be a function unless "data.tester" is a regular expession'); }
-
-			// insert trigger
+			this.triggergroups[triggergroup].addTrigger(trigger);
 		},
 
 		/* ****************************************************** *\
@@ -15447,9 +15510,21 @@ var DarkTip = (function (window, document, undefined) {
 			}
 		},
 
-		'dummyFunc': function() {}
+		/* ****************************************************** *\
+		 * Internationalization
+		\* ****************************************************** */
+
+		'executeTrigger': function(a, b, c)
+		{
+
+		}
+
+		/* ****************************************************** *\
+		 * End
+		\* ****************************************************** */
+
 	};
 
-	return DarkTip;
+	return Core;
 
 })(window, window.document);
