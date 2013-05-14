@@ -1,7 +1,8 @@
-/*! DarkTip - v0.1.0 - 2013-05-02
-* Copyright (c) 2013 ; Licensed MIT */
-
-if(!window.jQuery || window.jQuery().jquery < '1.9.0') {
+/*!
+ * DarkTip - v0.1.0 - 2013-05-15
+ * http://darkspotinthecorner.github.io/DarkTip/
+ * Copyright (c) 2013 Martin Gelder <darkspotinthecorner@gmail.com>; Licensed MIT
+ */
 
 /*!
  * jQuery JavaScript Library v1.9.1
@@ -9601,10 +9602,6 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
 
 })( window );
 
-}
-
-if(!window.dust) {
-
 //
 // Dust - Asynchronous Templating v1.2.2
 // http://akdubya.github.com/dustjs
@@ -13202,20 +13199,6 @@ var parser = (function(){
 dust.parse = parser.parse;
 
 })(typeof exports !== 'undefined' ? exports : getGlobal());
-}
-
-if(!window.Messageformat) {
-
-/**
- * messageformat.js
- *
- * ICU PluralFormat + SelectFormat for JavaScript
- *
- * @author Alex Sexton - @SlexAxton
- * @version 0.1.5
- * @license WTFPL
- * @contributor_license Dojo CLA
-*/
 (function ( root ) {
 
   // Create the contructor function
@@ -15129,11 +15112,13 @@ MessageFormat.locale.de = function ( n ) {
   }
   return "other";
 };
-}
-
 var DarkTip = (function (window, document, undefined)
 {
 	var console = window.console || { 'log': function(message) { return false; }};
+
+	/* ########################################################################## *\
+	 * ### Factory ############################################################## *
+	\* ########################################################################## */
 
 	var Factory = {
 
@@ -15146,22 +15131,79 @@ var DarkTip = (function (window, document, undefined)
 		}
 	};
 
+	/* ########################################################################## *\
+	 * ### Validator ############################################################ *
+	\* ########################################################################## */
+
+	var Validator = {
+
+		'isUndefined': Factory.makePrototypeCheck('[object Undefined]'),
+		'isNumber'   : Factory.makePrototypeCheck('[object Number]'),
+		'isString'   : Factory.makePrototypeCheck('[object String]'),
+		'isRegExp'   : Factory.makePrototypeCheck('[object RegExp]'),
+		'isArray'    : Factory.makePrototypeCheck('[object Array]'),
+		'isFunction' : Factory.makePrototypeCheck('[object Function]'),
+		'isObject'   : Factory.makePrototypeCheck('[object Object]'),
+
+		'throwError' : function(message, context, context_data)
+		{
+			var text = '';
+
+			if (!Validator.isUndefined(context))
+			{
+				text = context;
+
+				if (!Validator.isUndefined(context_data))
+				{
+					if (Validator.isString(context_data))
+					{
+						text = text + ' (' + context_data + ')';
+					}
+
+					if (Validator.isArray(context_data))
+					{
+						text = text + ' (' + context_data.join(':') + ')';
+					}
+				}
+
+				if (!Validator.isUndefined(message))
+				{
+					text = text + ' >>> ';
+				}
+			}
+
+			if (!Validator.isUndefined(message))
+			{
+				text = text + message;
+			}
+
+			throw new Error(text);
+		}
+	};
+
+	/* ########################################################################## *\
+	 * ### TriggerGroup ######################################################### *
+	\* ########################################################################## */
+
 	var TriggerGroup = function(name, data)
 	{
 		this.triggers = [];
 
-		if (Core.isUndefined(name)) { throw new Error('trigger group register >>> required parameter "name" is missing'); }
-		if (!Core.isString(name)) { throw new Error('trigger group register >>> required parameter "name" must be a string'); }
-		if (Core.isTriggerGroupRegistered(name)) { throw new Error('trigger group register >>> name "' + name + '" already exists'); }
+		if (Validator.isUndefined(name)) { Validator.throwError('required parameter "name" is missing', 'trigger group register'); }
+		if (!Validator.isString(name)) { Validator.throwError('required parameter "name" must be a string', 'trigger group register'); }
+		if (Core.isTriggerGroupRegistered(name)) { Validator.throwError('name "' + name + '" already exists', 'trigger group register'); }
 
-		if (Core.isUndefined(data)) { throw new Error('trigger group regsiter (' + name + ') >>> required parameter "data" is missing'); }
-		if (!Core.isObject(data)) { throw new Error('trigger group regsiter (' + name + ') >>> required parameter "data" must be an object'); }
+		if (Validator.isUndefined(data)) { Validator.throwError('required parameter "data" is missing', 'trigger group register', name); }
+		if (!Validator.isObject(data)) { Validator.throwError('required parameter "data" must be an object', 'trigger group register', name); }
 
-		if (Core.isUndefined(data['selector'])) { throw new Error('trigger group register (' + name + ') >>> required parameter "data.selector" is missing'); }
-		if (!Core.isString(data['selector'])) { throw new Error('trigger group register (' + name + ') >>> required parameter "data.selector" must be a string'); }
+		if (Validator.isUndefined(data['event'])) { data['event'] = 'mouseenter'; }
+		if (!Validator.isString(data['event'])) { Validator.throwError('required parameter "data.event" must be a string', 'trigger group register', name); }
 
-		if (Core.isUndefined(data['extractor'])) { throw new Error('trigger group register (' + name + ') >>> required parameter "data.extractor" is missing'); }
-		if (!Core.isFunction(data['extractor'])) { throw new Error('trigger group register (' + name + ') >>> required parameter "data.extractor" must be a function'); }
+		if (Validator.isUndefined(data['selector'])) { Validator.throwError('required parameter "data.selector" is missing', 'trigger group register', name); }
+		if (!Validator.isString(data['selector'])) { Validator.throwError('required parameter "data.selector" must be a string', 'trigger group register', name); }
+
+		if (Validator.isUndefined(data['extractor'])) { Validator.throwError('required parameter "data.extractor" is missing', 'trigger group register', name); }
+		if (!Validator.isFunction(data['extractor'])) {  Validator.throwError('required parameter "data.extractor" must be a function', 'trigger group register', name); }
 
 		this.addTrigger = function(trigger)
 		{
@@ -15191,30 +15233,40 @@ var DarkTip = (function (window, document, undefined)
 			}
 		};
 
-		// func: get trigger to apply (later added = higher priority)
+		this.registerEvent = function()
+		{
+			var that = this;
+
+			window.jQuery(document).on(data['event'], data['selector'], function(e)
+			{
+				that.findTrigger(this);
+			});
+		};
 	};
 
-	var Trigger = function(module, triggergroup, data)
+	/* ########################################################################## *\
+	 * ### Trigger ############################################################## *
+	\* ########################################################################## */
+
+	var Trigger = function(module, data)
 	{
-		if (Core.isUndefined(module)) { throw new Error('trigger regsiter >>> required parameter "module" is missing'); }
+		if (Validator.isUndefined(module)) { Validator.throwError('required parameter "module" is missing', 'trigger register'); }
+		if (!Validator.isString(module)) { Validator.throwError('required parameter "module" must be a string', 'trigger register'); }
 
-		if (Core.isUndefined(triggergroup)) { throw new Error('trigger regsiter (' + module + ') >>> required parameter "triggergroup" is missing'); }
-		if (!Core.isTriggerGroupRegistered(triggergroup)) { throw new Error('trigger regsiter (' + module + ') >>> triggergroup "' + triggergroup + '" does not exist'); }
+		if (Validator.isUndefined(data)) { Validator.throwError('required parameter "data" is missing', 'trigger register', module); }
+		if (!Validator.isObject(data)) { Validator.throwError('parameter "data" must be an object', 'trigger register', module); }
 
-		if (Core.isUndefined(data)) { throw new Error('trigger regsiter (' + module + ':' + triggergroup + ') >>> required parameter "data" is missing'); }
-		if (!Core.isObject(data)) { throw new Error('trigger regsiter (' + module + ':' + triggergroup + ') >>> parameter "data" must be an object'); }
+		if (Validator.isUndefined(data['tester'])) { Validator.throwError('required parameter "data.tester" is missing', 'trigger register', module); }
+		if (!Validator.isFunction(data['tester']) && !Validator.isRegExp(data['tester'])) { Validator.throwError('parameter "data.tester" must be a regular expression or function', 'trigger register', module); }
 
-		if (Core.isUndefined(data['tester'])) { throw new Error('trigger register (' + module + ':' + triggergroup + ') >>> required parameter "data.tester" is missing'); }
-		if (!Core.isFunction(data['tester']) && !Core.isRegExp(data['tester'])) { throw new Error('trigger register (' + module + ':' + triggergroup + ') >>> parameter "data.tester" must be a regular expression or function'); }
+		if (Validator.isUndefined(data['paramizer'])) { Validator.throwError('required parameter "data.paramizer" is missing', 'trigger register', module); }
+		if (!Validator.isFunction(data['paramizer']) && !Validator.isObject(data['paramizer'])) { Validator.throwError('parameter "data.paramizer" must be a function or object', 'trigger register', module); }
 
-		if (Core.isUndefined(data['paramizer'])) { throw new Error('trigger register (' + module + ':' + triggergroup + ') >>> required parameter "data.paramizer" is missing'); }
-		if (!Core.isFunction(data['paramizer']) && !Core.isObject(data['paramizer'])) { throw new Error('trigger register (' + module + ':' + triggergroup + ') >>> parameter "data.paramizer" must be a function or object'); }
-
-		if (Core.isObject(data['paramizer']) && !Core.isRegExp(data['tester'])) { throw new Error('trigger register (' + module + ':' + triggergroup + ') >>> parameter "data.paramizer" must be a function unless "data.tester" is a regular expession'); }
+		if (Validator.isObject(data['paramizer']) && !Validator.isRegExp(data['tester'])) { Validator.throwError('parameter "data.paramizer" must be a function unless "data.tester" is a regular expession', 'trigger register', module); }
 
 		this.module = module;
 
-		if (Core.isRegExp(data['tester']))
+		if (Validator.isRegExp(data['tester']))
 		{
 			this.doesApply = function(testthis)
 			{
@@ -15226,15 +15278,173 @@ var DarkTip = (function (window, document, undefined)
 			this.doesApply = data['tester'];
 		}
 
-		if (Core.isObject(data['paramizer']))
+		if (Validator.isObject(data['paramizer']))
 		{
-			this.getParams = function() {};
+			this.getParams = function(result)
+			{
+				var params = {};
+
+				for (var p in data['paramizer'])
+				{
+					params[data['paramizer'][p]] = result[p];
+				}
+
+				return params;
+			};
 		}
 		else
 		{
 			this.getParams = data['paramizer'];
 		}
 	};
+
+	/* ########################################################################## *\
+	 * ### Module ############################################################### *
+	\* ########################################################################## */
+
+	var Module = function(data) {
+
+		var key;
+
+		if (Validator.isUndefined(data)) { Validator.throwError('required parameter "data" is missing', 'module init'); }
+		if (!Validator.isObject(data)) { Validator.throwError('required parameter "data" must be an object', 'module init'); }
+
+		if (Validator.isUndefined(data['name'])) { Validator.throwError('required property "data.name" is missing', 'module init'); }
+		if (!Validator.isString(data['name'])) { Validator.throwError('required property "data.name" must be a string', 'module init'); }
+		if (Core.isModuleRegistered(data['name'])) { Validator.throwError('data.name "' + data['name'] + '" already exists', 'module init'); }
+
+		if (!Validator.isUndefined(data['inherit']))
+		{
+			if (!Validator.isString(data['inherit']) && !Validator.isArray(data['inherit']))
+			{
+				Validator.throwError('optional property "data.inherit" must be a string or array', 'module init', data['name']);
+			}
+
+			if (Validator.isArray(data['inherit']))
+			{
+				for(key in data['inherit'])
+				{
+					if (!Validator.isString(data['inherit'][key]))
+					{
+						Validator.throwError('optional property "data.inherit.' + key + '" must be a string', 'module init', data['name']);
+					}
+					else
+					{
+						if (!Core.isModuleRegistered(data['inherit'][key]))
+						{
+							Validator.throwError('parent module "' + data['inherit'][key] + '" is invalid', 'module init', data['name']);
+						}
+					}
+				}
+			}
+
+			if (Validator.isString(data['inherit']))
+			{
+				if (!Core.isModuleRegistered(data['inherit']))
+				{
+					Validator.throwError('parent module "' + data['inherit'] + '" is invalid', 'module init', data['name']);
+				}
+
+				data['inherit'] = [data['inherit']];
+			}
+		}
+		else
+		{
+			data['inherit'] = [];
+		}
+
+		if (!Validator.isUndefined(data['triggergroups']))
+		{
+			if (!Validator.isObject(data['triggergroups']))
+			{
+				Validator.throwError('optional property "data.triggergroups" must be an object', 'module init', data['name']);
+			}
+
+			for (key in data['triggergroups'])
+			{
+				Core.registerTriggerGroup(key, data['triggergroups'][key]);
+			}
+		}
+
+		if (!Validator.isUndefined(data['triggers']))
+		{
+			if (!Validator.isObject(data['triggers'])) { Validator.throwError('optional property "data.triggers" must be an object', 'module init', data['name']); }
+
+			for(var triggergroupname in data['triggers'])
+			{
+				if (!Validator.isArray(data['triggers'][triggergroupname])) { Validator.throwError('trigger group "' + triggergroupname + '" must be an array', 'module init', data['name']); }
+
+				for (var triggerindex in data['triggers'][triggergroupname])
+				{
+					Core.getTriggerGroup(triggergroupname).addTrigger(new Trigger(data['name'], data['triggers'][triggergroupname][triggerindex]));
+				}
+			}
+		}
+
+		if (Validator.isUndefined(data['payload'])) { Validator.throwError('required property "data.payload" is missing', 'module init', data['name']); }
+		if (!Validator.isString(data['payload']) && !Validator.isObject(data['payload'])) { Validator.throwError('required property "data.payload" must be a string or object', 'module init', data['name']); }
+
+		if(Validator.isObject(data['payload']))
+		{
+			// maps - object
+			// validateApiResponse - function
+			// templates - obeject
+			//
+		}
+
+		this.active = false;
+
+		this.activate = function()
+		{
+			if (this.active === false)
+			{
+				if (Validator.isString(data['payload']))
+				{
+					// Fetch payload from remove JSON source
+				}
+				else
+				{
+					// Init normally
+				}
+			}
+
+			return false;
+		};
+
+
+		this.get = function(key)
+		{
+			// look in this module
+			if (typeof this[key] !== 'undefined')
+			{
+				return this[key];
+			}
+
+			// look in each parent module
+			var parents = this.getParentModuleNames();
+
+			for (var modulename in parents)
+			{
+				// return the lowest depth result, parent module order matters (take first)
+				return Core.modules[modulename].get(key);
+			}
+
+			return undefined;
+		};
+
+		this.getInheritanceStack = function()
+		{
+			var seen = [];
+
+			// get all parents
+
+			// foreach parent extract all parents and add them to the stack
+		};
+	};
+
+	/* ########################################################################## *\
+	 * ### Core ################################################################# *
+	\* ########################################################################## */
 
 	var Core = {
 
@@ -15246,31 +15456,26 @@ var DarkTip = (function (window, document, undefined)
 		{
 			// foreach trigger group register it's selectors via jQuery
 
-			for (var key in this.triggers)
+			for (var key in Core.triggergroups)
 			{
-				var trigger = this.triggers[key];
-
-				console.log(trigger);
+				Core.triggergroups[key].registerEvent();
 			}
 		},
-
-		/* ****************************************************** *\
-		 * Helpers
-		\* ****************************************************** */
-
-		'isUndefined': Factory.makePrototypeCheck('[object Undefined]'),
-		'isNumber'   : Factory.makePrototypeCheck('[object Number]'),
-		'isString'   : Factory.makePrototypeCheck('[object String]'),
-		'isRegExp'   : Factory.makePrototypeCheck('[object RegExp]'),
-		'isArray'    : Factory.makePrototypeCheck('[object Array]'),
-		'isFunction' : Factory.makePrototypeCheck('[object Function]'),
-		'isObject'   : Factory.makePrototypeCheck('[object Object]'),
 
 		/* ****************************************************** *\
 		 * Triggers
 		\* ****************************************************** */
 
 		'triggergroups': {},
+
+		'getTriggerGroup': function(name)
+		{
+			if (Validator.isUndefined(name)) { Validator.throwError('required parameter "name" is missing', 'trigger group access'); }
+			if (!Validator.isString(name)) { Validator.throwError('required parameter "name" must be a string', 'trigger group access'); }
+			if (!Core.isTriggerGroupRegistered(name)) { Validator.throwError('trigger group "' + name + '" is invalid', 'trigger group access'); }
+
+			return Core.triggergroups[name];
+		},
 
 		'isTriggerGroupRegistered': function(name)
 		{
@@ -15289,148 +15494,6 @@ var DarkTip = (function (window, document, undefined)
 			this.triggergroups[name] = triggergroup;
 		},
 
-		'registerTrigger': function(module, triggergroup, data)
-		{
-			var trigger = new Trigger(module, triggergroup, data);
-
-			this.triggergroups[triggergroup].addTrigger(trigger);
-		},
-
-		/* ****************************************************** *\
-		 * Module
-		\* ****************************************************** */
-
-		'BaseModule': (function()
-		{
-			var Module = function(data) {
-
-				this.active = false;
-
-				this.activate = function()
-				{
-					if (this.active === false)
-					{
-						// if payload is string: fetch content from remote file
-						// else: init normally
-					}
-
-					return false;
-				};
-
-				this.init = function(data)
-				{
-					var key = '';
-
-					if (!DarkTip.isObject(data))                  { throw new Error('module init >>> No valid data object given'); }
-					if (DarkTip.isUndefined(data['name']))        { throw new Error('module init >>> required property "name" is missing'); }
-					if (!DarkTip.isString(data['name']))          { throw new Error('module init (' + data['name'] + ') >>> required property "name" must be a string'); }
-					if (DarkTip.isModuleRegistered(data['name'])) { throw new Error('module init (' + data['name'] + ') >>> "name" is already in use'); }
-
-					if (!DarkTip.isUndefined(data['inherit']))
-					{
-						if (!DarkTip.isString(data['inherit']) && !DarkTip.isArray(data['inherit']))
-						{
-							throw new Error('module init (' + data['name'] + ') >>> optional property "inherit" must be either string or array');
-						}
-
-						if (DarkTip.isArray(data['inherit']))
-						{
-							for(key in data['inherit'])
-							{
-								if (!DarkTip.isString(data['inherit'][key]))
-								{
-									throw new Error('module init (' + data['name'] + ') >>> optional property "inherit" must be an array of strings');
-								}
-								else
-								{
-									if (!DarkTip.isModuleRegistered(data['inherit'][key]))
-									{
-										throw new Error('module init (' + data['name'] + ') >>> parent module "' + data['inherit'][key] + '" is missing');
-									}
-								}
-							}
-						}
-
-						if (DarkTip.isString(data['inherit']))
-						{
-							if (!DarkTip.isModuleRegistered(data['inherit']))
-							{
-								throw new Error('module init (' + data['name'] + ') >>> parent module "' + data['inherit'] + '" is missing');
-							}
-						}
-					}
-
-					var triggergroup = '';
-
-					if (!DarkTip.isUndefined(data['triggergroups']))
-					{
-						if (!DarkTip.isObject(data['triggergroups']))
-						{
-							throw new Error('module init (' + data['name'] + ') >>> optional property "triggergroups" must be an object');
-						}
-
-						for (key in data['triggergroups'])
-						{
-							triggergroup = data['triggergroups'][key];
-
-							DarkTip.registerTriggerGroup(key, triggergroup);
-						}
-					}
-
-					if (DarkTip.isUndefined(data['triggers'])) { throw new Error('module init (' + data['name'] + ') >>> required property "triggers" is missing'       ); }
-					if (!DarkTip.isObject(data['triggers']))   { throw new Error('module init (' + data['name'] + ') >>> required property "triggers" must be an object'); }
-
-					for(var triggergroupname in data['triggers'])
-					{
-						triggergroup = data['triggers'][triggergroupname];
-
-						if (!DarkTip.isArray(triggergroup)) { throw new Error('module init (' + data['name'] + ') >>> trigger group "' + triggergroupname + '" is not an array'); }
-
-						for (key in triggergroup)
-						{
-							DarkTip.registerTrigger(data['name'], triggergroupname, triggergroup[key]);
-						}
-					}
-
-
-
-
-
-
-
-					// insert module payload
-				};
-
-				this.get = function(key)
-				{
-					// look in this module
-					if (typeof this[key] !== 'undefined')
-					{
-						return this[key];
-					}
-
-					// look in each parent module
-					var parents = this.getParentModuleNames();
-
-					for (var modulename in parents)
-					{
-						// return the lowest depth result, parent module order matters (take first)
-						return DarkTip.modules[modulename].get(key);
-					}
-
-					return undefined;
-				};
-
-				this.getParentModuleNames = function()
-				{
-					// return all parent module names in order of definition
-				};
-			};
-
-			return new Module();
-		}
-		)(),
-
 		/* ****************************************************** *\
 		 * Module Handling
 		\* ****************************************************** */
@@ -15439,15 +15502,7 @@ var DarkTip = (function (window, document, undefined)
 
 		'registerModule': function(data)
 		{
-			var SubModule = function(data)
-			{
-				this.init(data);
-			};
-
-			SubModule.prototype             = this.BaseModule;
-			SubModule.prototype.constructor = SubModule;
-
-			var module = new SubModule(data);
+			var module = new Module(data);
 
 			this.modules[data.name] = module;
 

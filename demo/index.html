@@ -12,13 +12,15 @@
 			DarkTip.addLocaleString('en', 'elements_remaining', 'There is {num_elements, plural, one {one element} other {# elements}} remaining');
 
 			DarkTip.registerModule({
-				'name'    : 'wow',
+				'name': 'wow',
 				'triggergroups': {
 					'implicit': {
+						'event'    : 'mouseenter',
 						'selector' : 'a[href]',
 						'extractor': function(element) { return new String(element.attr('href')); }
 					},
 					'explicit': {
+						'event'    : 'mouseenter',
 						'selector' : '[data-darktip]',
 						'extractor': function(element) { return new String(element.data('darktip')); }
 					}
@@ -30,10 +32,29 @@
 							'paramizer': { 1: 'a', 2: 'b' }
 						},
 						{
-							'tester': /abab/i,
+							'tester'   : /abab/i,
 							'paramizer': { 1: 'aaa' }
 						}
 					]
+				},
+				'payload': {
+					//
+				}
+			});
+
+			DarkTip.registerModule({
+				'name': 'wow.test',
+				'inherit': 'wow',
+				'triggers': {
+					'implicit': [
+						{
+							'tester'   : /aaaaxxxx/i,
+							'paramizer': { 1: 'x', 2: 'y' }
+						}
+					]
+				},
+				'payload': {
+					//
 				}
 			});
 

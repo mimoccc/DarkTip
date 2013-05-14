@@ -1,0 +1,69 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node',
+1 verbose cli   '/usr/local/bin/npm',
+1 verbose cli   'install',
+1 verbose cli   'grunt-contrib-lint',
+1 verbose cli   '--save-dev' ]
+2 info using npm@1.2.18
+3 info using node@v0.10.5
+4 verbose read json /Applications/MAMP/htdocs/test/github/DarkTip/package.json
+5 verbose read json /Applications/MAMP/htdocs/test/github/DarkTip/node_modules/grunt/package.json
+6 verbose read json /Applications/MAMP/htdocs/test/github/DarkTip/node_modules/grunt-contrib-clean/package.json
+7 verbose read json /Applications/MAMP/htdocs/test/github/DarkTip/node_modules/grunt-contrib-concat/package.json
+8 verbose read json /Applications/MAMP/htdocs/test/github/DarkTip/node_modules/grunt-contrib-connect/package.json
+9 verbose read json /Applications/MAMP/htdocs/test/github/DarkTip/node_modules/grunt-contrib-jshint/package.json
+10 verbose read json /Applications/MAMP/htdocs/test/github/DarkTip/node_modules/grunt-contrib-nodeunit/package.json
+11 verbose read json /Applications/MAMP/htdocs/test/github/DarkTip/node_modules/grunt-contrib-qunit/package.json
+12 verbose read json /Applications/MAMP/htdocs/test/github/DarkTip/node_modules/grunt-contrib-uglify/package.json
+13 verbose read json /Applications/MAMP/htdocs/test/github/DarkTip/node_modules/grunt-contrib-watch/package.json
+14 verbose from cache /Applications/MAMP/htdocs/test/github/DarkTip/package.json
+15 verbose readDependencies using package.json deps
+16 verbose cache add [ 'grunt-contrib-lint', null ]
+17 verbose cache add name=undefined spec="grunt-contrib-lint" args=["grunt-contrib-lint",null]
+18 verbose parsed url { protocol: null,
+18 verbose parsed url   slashes: null,
+18 verbose parsed url   auth: null,
+18 verbose parsed url   host: null,
+18 verbose parsed url   port: null,
+18 verbose parsed url   hostname: null,
+18 verbose parsed url   hash: null,
+18 verbose parsed url   search: null,
+18 verbose parsed url   query: null,
+18 verbose parsed url   pathname: 'grunt-contrib-lint',
+18 verbose parsed url   path: 'grunt-contrib-lint',
+18 verbose parsed url   href: 'grunt-contrib-lint' }
+19 silly lockFile e995a02a-grunt-contrib-lint grunt-contrib-lint
+20 verbose lock grunt-contrib-lint /var/root/.npm/e995a02a-grunt-contrib-lint.lock
+21 silly lockFile e995a02a-grunt-contrib-lint grunt-contrib-lint
+22 silly lockFile e995a02a-grunt-contrib-lint grunt-contrib-lint
+23 verbose addNamed [ 'grunt-contrib-lint', '' ]
+24 verbose addNamed [ null, '' ]
+25 silly lockFile b8ffe91d-grunt-contrib-lint grunt-contrib-lint@
+26 verbose lock grunt-contrib-lint@ /var/root/.npm/b8ffe91d-grunt-contrib-lint.lock
+27 silly addNameRange { name: 'grunt-contrib-lint', range: '', hasData: false }
+28 verbose url raw grunt-contrib-lint
+29 verbose url resolving [ 'https://registry.npmjs.org/', './grunt-contrib-lint' ]
+30 verbose url resolved https://registry.npmjs.org/grunt-contrib-lint
+31 info trying registry request attempt 1 at 15:03:04
+32 http GET https://registry.npmjs.org/grunt-contrib-lint
+33 http 404 https://registry.npmjs.org/grunt-contrib-lint
+34 silly registry.get cb [ 404,
+34 silly registry.get   { server: 'CouchDB/1.3.0 (Erlang OTP/R15B03)',
+34 silly registry.get     date: 'Tue, 14 May 2013 13:03:05 GMT',
+34 silly registry.get     'content-type': 'application/json',
+34 silly registry.get     'content-length': '52',
+34 silly registry.get     'cache-control': 'must-revalidate' } ]
+35 silly lockFile b8ffe91d-grunt-contrib-lint grunt-contrib-lint@
+36 silly lockFile b8ffe91d-grunt-contrib-lint grunt-contrib-lint@
+37 error 404 'grunt-contrib-lint' is not in the npm registry.
+37 error 404 You should bug the author to publish it
+37 error 404
+37 error 404 Note that you can also install from a
+37 error 404 tarball, folder, or http url, or git url.
+38 error System Darwin 12.3.0
+39 error command "node" "/usr/local/bin/npm" "install" "grunt-contrib-lint" "--save-dev"
+40 error cwd /Applications/MAMP/htdocs/test/github/DarkTip
+41 error node -v v0.10.5
+42 error npm -v 1.2.18
+43 error code E404
+44 verbose exit [ 1, true ]
